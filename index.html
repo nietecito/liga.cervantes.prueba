@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torneo de Fútbol</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-900 text-white min-h-screen font-sans">
+
+    <!-- Header -->
+    <header class="bg-slate-800 border-b border-slate-700 p-6 text-center shadow-lg">
+        <h1 class="text-3xl font-extrabold text-emerald-400 tracking-wider uppercase">🏆 Torneo de Fútbol</h1>
+        <p class="text-slate-400 text-sm mt-1">Calendario Oficial y Clasificación</p>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-8">
+
+        <!-- Navigation Tabs -->
+        <div class="flex justify-center space-x-4 border-b border-slate-700 pb-4">
+            <button onclick="switchTab('jornadas')" id="tab-jornadas" class="px-6 py-2 rounded-lg font-bold bg-emerald-500 text-slate-900 transition-all shadow-md">
+                <i class="fa-solid fa-calendar-days mr-2"></i>Jornadas y Partidos
+            </button>
+            <button onclick="switchTab('clasificacion')" id="tab-clasificacion" class="px-6 py-2 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all">
+                <i class="fa-solid fa-trophy mr-2"></i>Clasificación
+            </button>
+            <button onclick="switchTab('matriz')" id="tab-matriz" class="px-6 py-2 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all">
+                <i class="fa-solid fa-table-cells mr-2"></i>Cuadro Directo
+            </button>
+        </div>
+
+        <!-- TAB 1: JORNADAS -->
+        <section id="sec-jornadas" class="space-y-6">
+            <!-- Selector de Jornada -->
+            <div class="flex items-center justify-between bg-slate-800 p-4 rounded-xl border border-slate-700 max-w-md mx-auto">
+                <button onclick="changeJornada(-1)" class="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-emerald-400 font-bold transition">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <span id="jornada-title" class="text-xl font-bold text-slate-100">Jornada 1</span>
+                <button onclick="changeJornada(1)" class="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-emerald-400 font-bold transition">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- Lista de Partidos -->
+            <div id="matches-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+                <!-- Partidos generados dinámicamente con JS -->
+            </div>
+        </section>
+
+        <!-- TAB 2: CLASIFICACIÓN -->
+        <section id="sec-clasificacion" class="hidden">
+            <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden shadow-xl max-w-5xl mx-auto">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-700/50 text-slate-300 text-xs uppercase tracking-wider border-b border-slate-700">
+                                <th class="p-4 text-center">Pos</th>
+                                <th class="p-4">Equipo</th>
+                                <th class="p-4 text-center">PJ</th>
+                                <th class="p-4 text-center">PG</th>
+                                <th class="p-4 text-center">PE</th>
+                                <th class="p-4 text-center">PP</th>
+                                <th class="p-4 text-center font-bold text-emerald-400">PTS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clasificacion-body" class="divide-y divide-slate-700/50 text-sm">
+                            <!-- Filas generadas con JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: MATRIZ DE ENFRENTAMIENTOS -->
+        <section id="sec-matriz" class="hidden">
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 overflow-x-auto shadow-xl">
+                <h2 class="text-lg font-bold mb-4 text-emerald-400 text-center">Matriz de Enfrentamientos (Casa / Fuera)</h2>
+                <table class="w-full text-xs text-center border-collapse border border-slate-700">
+                    <thead id="matriz-head"></thead>
+                    <tbody id="matriz-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const teams = [
+            "ACHUNATY",
+            "AMJ LEGAL FC",
+            "BIRRAREAL FC",
+            "BURDEL KING FC",
+            "CHARCA PIRATA",
+            "FC DEPORTIVO LICO",
+            "GOONIES FC",
+            "MAHOURINHO FC",
+            "PESETA DG",
+            "RSD AL-KHALABOZO"
+        ];
+
+        // Definición directa de todos los partidos extraídos de la matriz suministrada
+        const matchesData = [
+            // J1
+            { j: 1, home: "RSD AL-KHALABOZO", away: "AMJ LEGAL FC" },
+            { j: 1, home: "FC DEPORTIVO LICO", away: "GOONIES FC" },
+            { j: 1, home: "MAHOURINHO FC", away: "BURDEL KING FC" },
+            { j: 1, home: "ACHUNATY", away: "BIRRAREAL FC" },
+            { j: 1, home: "BURDEL KING FC", away: "PESETA DG" },
+
+            // J2
+            { j: 2, home: "CHARCA PIRATA", away: "ACHUNATY" },
+            { j: 2, home: "AMJ LEGAL FC", away: "BURDEL KING FC" },
+            { j: 2, home: "BIRRAREAL FC", away: "RSD AL-KHALABOZO" },
+            { j: 2, home: "GOONIES FC", away: "MAHOURINHO FC" },
+            { j: 2, home: "PESETA DG", away: "FC DEPORTIVO LICO" },
+
+            // J3
+            { j: 3, home: "FC DEPORTIVO LICO", away: "AMJ LEGAL FC" },
+            { j: 3, home: "BIRRAREAL FC", away: "CHARCA PIRATA" },
+            { j: 3, home: "ACHUNATY", away: "GOONIES FC" },
+            { j: 3, home: "RSD AL-KHALABOZO", away: "BURDEL KING FC" },
+            { j: 3, home: "MAHOURINHO FC", away: "PESETA DG" },
+
+            // J4
+            { j: 4, home: "PESETA DG", away: "ACHUNATY" },
+            { j: 4, home: "AMJ LEGAL FC", away: "MAHOURINHO FC" },
+            { j: 4, home: "BURDEL KING FC", away: "FC DEPORTIVO LICO" },
+            { j: 4, home: "CHARCA PIRATA", away: "RSD AL-KHALABOZO" },
+            { j: 4, home: "GOONIES FC", away: "BIRRAREAL FC" },
+
+            // J5
+            { j: 5, home: "ACHUNATY", away: "AMJ LEGAL FC" },
+            { j: 5, home: "BIRRAREAL FC", away: "PESETA DG" },
+            { j: 5, home: "CHARCA PIRATA", away: "GOONIES FC" },
+            { j: 5, home: "MAHOURINHO FC", away: "BURDEL KING FC" },
+            { j: 5, home: "RSD AL-KHALABOZO", away: "FC DEPORTIVO LICO" },
+
+            // J6
+            { j: 6, home: "BURDEL KING FC", away: "ACHUNATY" },
+            { j: 6, home: "AMJ LEGAL FC", away: "BIRRAREAL FC" },
+            { j: 6, home: "PESETA DG", away: "CHARCA PIRATA" },
+            { j: 6, home: "GOONIES FC", away: "RSD AL-KHALABOZO" },
+            { j: 6, home: "FC DEPORTIVO LICO", away: "MAHOURINHO FC" },
+
+            // J7
+            { j: 7, home: "ACHUNATY", away: "FC DEPORTIVO LICO" },
+            { j: 7, home: "CHARCA PIRATA", away: "AMJ LEGAL FC" },
+            { j: 7, home: "BIRRAREAL FC", away: "BURDEL KING FC" },
+            { j: 7, home: "GOONIES FC", away: "PESETA DG" },
+            { j: 7, home: "RSD AL-KHALABOZO", away: "MAHOURINHO FC" },
+
+            // J8
+            { j: 8, home: "MAHOURINHO FC", away: "ACHUNATY" },
+            { j: 8, home: "AMJ LEGAL FC", away: "GOONIES FC" },
+            { j: 8, home: "FC DEPORTIVO LICO", away: "BIRRAREAL FC" },
+            { j: 8, home: "BURDEL KING FC", away: "CHARCA PIRATA" },
+            { j: 8, home: "RSD AL-KHALABOZO", away: "PESETA DG" },
+
+            // J9
+            { j: 9, home: "ACHUNATY", away: "RSD AL-KHALABOZO" },
+            { j: 9, home: "PESETA DG", away: "AMJ LEGAL FC" },
+            { j: 9, home: "BIRRAREAL FC", away: "MAHOURINHO FC" },
+            { j: 9, home: "CHARCA PIRATA", away: "FC DEPORTIVO LICO" },
+            { j: 9, home: "GOONIES FC", away: "BURDEL KING FC" },
+
+            // J10
+            { j: 10, home: "BIRRAREAL FC", away: "ACHUNATY" },
+            { j: 10, home: "AMJ LEGAL FC", away: "RSD AL-KHALABOZO" },
+            { j: 10, home: "BURDEL KING FC", away: "PESETA DG" },
+            { j: 10, home: "MAHOURINHO FC", away: "CHARCA PIRATA" },
+            { j: 10, home: "GOONIES FC", away: "FC DEPORTIVO LICO" },
+
+            // J11
+            { j: 11, home: "ACHUNATY", away: "CHARCA PIRATA" },
+            { j: 11, home: "BURDEL KING FC", away: "AMJ LEGAL FC" },
+            { j: 11, home: "RSD AL-KHALABOZO", away: "BIRRAREAL FC" },
+            { j: 11, home: "MAHOURINHO FC", away: "GOONIES FC" },
+            { j: 11, home: "FC DEPORTIVO LICO", away: "PESETA DG" },
+
+            // J12
+            { j: 12, home: "AMJ LEGAL FC", away: "FC DEPORTIVO LICO" },
+            { j: 12, home: "CHARCA PIRATA", away: "BIRRAREAL FC" },
+            { j: 12, home: "GOONIES FC", away: "ACHUNATY" },
+            { j: 12, home: "BURDEL KING FC", away: "RSD AL-KHALABOZO" },
+            { j: 12, home: "PESETA DG", away: "MAHOURINHO FC" },
+
+            // J13
+            { j: 13, home: "ACHUNATY", away: "PESETA DG" },
+            { j: 13, home: "MAHOURINHO FC", away: "AMJ LEGAL FC" },
+            { j: 13, home: "FC DEPORTIVO LICO", away: "BURDEL KING FC" },
+            { j: 13, home: "RSD AL-KHALABOZO", away: "CHARCA PIRATA" },
+            { j: 13, home: "BIRRAREAL FC", away: "GOONIES FC" },
+
+            // J14
+            { j: 14, home: "AMJ LEGAL FC", away: "ACHUNATY" },
+            { j: 14, home: "PESETA DG", away: "BIRRAREAL FC" },
+            { j: 14, home: "GOONIES FC", away: "CHARCA PIRATA" },
+            { j: 14, home: "BURDEL KING FC", away: "MAHOURINHO FC" },
+            { j: 14, home: "FC DEPORTIVO LICO", away: "RSD AL-KHALABOZO" },
+
+            // J15
+            { j: 15, home: "ACHUNATY", away: "BURDEL KING FC" },
+            { j: 15, home: "BIRRAREAL FC", away: "AMJ LEGAL FC" },
+            { j: 15, home: "CHARCA PIRATA", away: "PESETA DG" },
+            { j: 15, home: "RSD AL-KHALABOZO", away: "GOONIES FC" },
+            { j: 15, home: "MAHOURINHO FC", away: "FC DEPORTIVO LICO" },
+
+            // J16
+            { j: 16, home: "FC DEPORTIVO LICO", away: "ACHUNATY" },
+            { j: 16, home: "AMJ LEGAL FC", away: "CHARCA PIRATA" },
+            { j: 16, home: "BURDEL KING FC", away: "BIRRAREAL FC" },
+            { j: 16, home: "PESETA DG", away: "GOONIES FC" },
+            { j: 16, home: "MAHOURINHO FC", away: "RSD AL-KHALABOZO" },
+
+            // J17
+            { j: 17, home: "ACHUNATY", away: "MAHOURINHO FC" },
+            { j: 17, home: "GOONIES FC", away: "AMJ LEGAL FC" },
+            { j: 17, home: "BIRRAREAL FC", away: "FC DEPORTIVO LICO" },
+            { j: 17, home: "CHARCA PIRATA", away: "BURDEL KING FC" },
+            { j: 17, home: "PESETA DG", away: "RSD AL-KHALABOZO" },
+
+            // J18
+            { j: 18, home: "RSD AL-KHALABOZO", away: "ACHUNATY" },
+            { j: 18, home: "AMJ LEGAL FC", away: "PESETA DG" },
+            { j: 18, home: "MAHOURINHO FC", away: "BIRRAREAL FC" },
+            { j: 18, home: "FC DEPORTIVO LICO", away: "CHARCA PIRATA" },
+            { j: 18, home: "BURDEL KING FC", away: "GOONIES FC" }
+        ];
+
+        let currentJornada = 1;
+
+        function renderJornada(j) {
+            const container = document.getElementById('matches-container');
+            document.getElementById('jornada-title').innerText = `Jornada ${j}`;
+            container.innerHTML = '';
+
+            const currentMatches = matchesData.filter(m => m.j === j);
+
+            currentMatches.forEach(m => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-800 p-4 rounded-xl border border-slate-700/80 shadow-md flex items-center justify-between";
+                card.innerHTML = `
+                    <div class="flex-1 text-right font-medium text-slate-200">${m.home}</div>
+                    <div class="px-4 py-1 bg-slate-900 border border-slate-700 rounded text-xs font-bold text-emerald-400 mx-3">VS</div>
+                    <div class="flex-1 text-left font-medium text-slate-200">${m.away}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function changeJornada(delta) {
+            currentJornada += delta;
+            if (currentJornada < 1) currentJornada = 18;
+            if (currentJornada > 18) currentJornada = 1;
+            renderJornada(currentJornada);
+        }
+
+        function renderClasificacion() {
+            const tbody = document.getElementById('clasificacion-body');
+            tbody.innerHTML = '';
+
+            // Clasificación editable por defecto ordenada alfabéticamente
+            teams.forEach((team, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-700/30 transition";
+                tr.innerHTML = `
+                    <td class="p-4 text-center font-bold text-slate-400">${index + 1}</td>
+                    <td class="p-4 font-semibold text-slate-100">${team}</td>
+                    <td class="p-4 text-center">0</td>
+                    <td class="p-4 text-center">0</td>
+                    <td class="p-4 text-center">0</td>
+                    <td class="p-4 text-center">0</td>
+                    <td class="p-4 text-center font-bold text-emerald-400">0</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderMatriz() {
+            const head = document.getElementById('matriz-head');
+            const body = document.getElementById('matriz-body');
+
+            let headHTML = `<tr class="bg-slate-700"><th class="p-2 border border-slate-600">CASA \\ FUERA</th>`;
+            teams.forEach(t => {
+                headHTML += `<th class="p-2 border border-slate-600 text-emerald-400">${t}</th>`;
+            });
+            headHTML += `</tr>`;
+            head.innerHTML = headHTML;
+
+            let bodyHTML = '';
+            teams.forEach(home => {
+                bodyHTML += `<tr><td class="p-2 border border-slate-600 font-bold bg-slate-700/50 text-emerald-400 text-left">${home}</td>`;
+                teams.forEach(away => {
+                    if (home === away) {
+                        bodyHTML += `<td class="p-2 border border-slate-600 bg-slate-900/80 text-slate-600">-</td>`;
+                    } else {
+                        const match = matchesData.find(m => m.home === home && m.away === away);
+                        const matchText = match ? `J${match.j}` : '';
+                        bodyHTML += `<td class="p-2 border border-slate-600 text-slate-300">${matchText}</td>`;
+                    }
+                });
+                bodyHTML += `</tr>`;
+            });
+            body.innerHTML = bodyHTML;
+        }
+
+        function switchTab(tab) {
+            document.getElementById('sec-jornadas').classList.add('hidden');
+            document.getElementById('sec-clasificacion').classList.add('hidden');
+            document.getElementById('sec-matriz').classList.add('hidden');
+
+            document.getElementById('tab-jornadas').className = "px-6 py-2 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all";
+            document.getElementById('tab-clasificacion').className = "px-6 py-2 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all";
+            document.getElementById('tab-matriz').className = "px-6 py-2 rounded-lg font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition-all";
+
+            document.getElementById(`sec-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).className = "px-6 py-2 rounded-lg font-bold bg-emerald-500 text-slate-900 transition-all shadow-md";
+        }
+
+        // Init
+        renderJornada(1);
+        renderClasificacion();
+        renderMatriz();
+    </script>
+</body>
+</html>
