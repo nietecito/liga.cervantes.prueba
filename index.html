@@ -473,24 +473,7 @@
     <div id="contenido" style="display: none;">
 
  <!-- INFORMACIÓN RESUMIDA -->
-      <div class="info-bar">
-
-        <div class="info-item">
-          Equipos:
-          <strong id="total-equipos">0</strong>
-        </div>
-
-        <div class="info-item">
-          Partidos jugados:
-          <strong id="total-partidos">0</strong>
-        </div>
-
-        <div class="info-item">
-          Jornadas:
-          <strong id="total-jornadas">0</strong>
-        </div>
-
-      </div>    
+         
 
 
       <!-- PESTAÑAS -->
@@ -998,10 +981,7 @@
       );
 
 
-      actualizarResumen(
-        equipos,
-        partidos
-      );
+      
 
     }
 
@@ -1009,82 +989,6 @@
     // ============================================================
     // RESUMEN
     // ============================================================
-
-    function actualizarResumen(
-      equipos,
-      partidos
-    ) {
-
-      const equiposValidos =
-        Object.keys(equipos).length;
-
-
-      let partidosJugados = 0;
-
-
-      partidos.forEach(partido => {
-
-        const local =
-          obtenerTexto(
-            partido['Equipo Local']
-          );
-
-        const visitante =
-          obtenerTexto(
-            partido['Equipo Visitante']
-          );
-
-
-        if (!local || !visitante) {
-          return;
-        }
-
-
-        const gl =
-          convertirGoles(
-            partido['Goles Local']
-          );
-
-        const gv =
-          convertirGoles(
-            partido['Goles Visitante']
-          );
-
-
-        if (
-          gl !== null &&
-          gv !== null
-        ) {
-
-          partidosJugados++;
-
-        }
-
-      });
-
-
-      const jornadas =
-        agruparJornadas(partidos);
-
-
-      document
-        .getElementById('total-equipos')
-        .textContent =
-        equiposValidos;
-
-
-      document
-        .getElementById('total-partidos')
-        .textContent =
-        partidosJugados;
-
-
-      document
-        .getElementById('total-jornadas')
-        .textContent =
-        Object.keys(jornadas).length;
-
-    }
 
 
     // ============================================================
